@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ring0-rootkit/golang-staff-mngmnt/internal/common/logging"
-	"github.com/ring0-rootkit/golang-staff-mngmnt/internal/middlware_service/repository"
+	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/common/logging"
+	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/middlware_service/repository"
 )
 
 var Log *log.Logger = logging.GetFor("middlware http handler")
 
-func StartShiftHandler(w http.ResponseWriter, r *http.Request) {
+func StartShift(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		Log.Printf("Error while getting path value (id) from path: %s \n", r.URL.Path)
@@ -31,7 +31,7 @@ func StartShiftHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func EndShiftHandler(w http.ResponseWriter, r *http.Request) {
+func EndShift(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		Log.Printf("Error while getting path value (id) from path: %s \n", r.URL.Path)

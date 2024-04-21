@@ -1,0 +1,10 @@
+services:
+  postgres:
+    container_name: db
+    image: postgres:13.3
+    environment:
+      POSTGRES_DB: "staff_mngmnt"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5432:5432"
