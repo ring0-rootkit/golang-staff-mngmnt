@@ -32,9 +32,14 @@ type Attendance struct {
 	WorkEventType WorkEvent
 }
 
+type Salary struct {
+	SpH float64 `gorm:"column:salary_per_hour"`
+}
+
 var db *gorm.DB
 var Log *log.Logger = logging.GetFor("db_service repository")
 
+// TODO: rewrite using godotenv
 func init() {
 	dsn := "host=localhost user=postgres password=postgres " +
 		"dbname=staff_mngmnt port=5432 sslmode=disable TimeZone=Europe/Minsk"
@@ -62,6 +67,13 @@ func GetHoursWorked(id int64) float64 {
 		hoursWorked += attendance[i+1].Time.Sub(attendance[i].Time).Hours()
 	}
 	return hoursWorked
+}
+
+func GetSalaryPerHour(id int64) float64 {
+	var s Salary
+	db.Table("salary").Select("salary_per_hour").Where("employee_id = ?", id).First(&s)
+
+	return s.SpH
 }
 
 func EmitWorkEvent(id int64, event WorkEvent) {

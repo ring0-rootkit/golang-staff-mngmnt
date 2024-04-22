@@ -6,6 +6,8 @@ import (
 	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/db_service/handlers"
 )
 
+//TODO: add admin page
+
 func main() {
 	mux := http.NewServeMux()
 
