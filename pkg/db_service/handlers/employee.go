@@ -2,10 +2,7 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"net/http"
-	"strconv"
 
 	"github.com/ring0-rootkit/golang-staff-mngmnt/grpc"
 	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/common/logging"
@@ -13,6 +10,11 @@ import (
 )
 
 var Log *log.Logger = logging.GetFor("db_service repository")
+
+var (
+	successCode          = grpc.ResponseCode{Code: 200}
+	noIdAndNameErrorCode = grpc.ResponseCode{Code: 400, Error: "no 'id' or 'name + surname' was provided"}
+)
 
 type EmployeeServer struct {
 	grpc.UnimplementedEmployeeControllerServer
@@ -28,81 +30,39 @@ func (EmployeeServer) EndWorkShift(ctx context.Context, e *grpc.Employee) (*grpc
 	return &grpc.ResponseCode{Code: 200, Error: ""}, nil
 }
 
-func (EmployeeServer) GetWorkedHours(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
-	if err != nil {
-		w.WriteHeader(500)
-		_, err = w.Write([]byte(`"error":"cannot parse an employee id"`))
-		if err != nil {
-			Log.Printf("error while trying to send response, err:%s", err.Error())
-		}
-		return
-	}
-	h := repository.GetHoursWorked(id)
-	jsonResponse := fmt.Sprintf(`"hours":"%f"`, h)
-	_, err = w.Write([]byte(jsonResponse))
-	if err != nil {
-		Log.Printf("error while trying to send response, err:%s", err.Error())
-	}
-}
+func (EmployeeServer) GetWorkedHours(ctx context.Context, e *grpc.Employee) (*grpc.HoursWorked, error) {
+	var id int64
+	if e.GetId() != 0 {
+		id = e.GetId()
+	} else if e.GetName() != "" && e.GetSurname() != "" {
+		name := e.GetName()
+		surname := e.GetSurname()
 
-func (EmployeeServer) GetWorkedHoursByName(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	surname := r.URL.Query().Get("surname")
-	if name == "" || surname == "" {
-		w.WriteHeader(500)
-		_, err := w.Write([]byte(`"error":"cannot parse an employee name/surname"`))
-		if err != nil {
-			Log.Printf("error while trying to send response, err:%s", err.Error())
-		}
-		return
+		id = repository.EmployeeIdByName(name, surname)
+	} else {
+		return &grpc.HoursWorked{ResponseCode: &noIdAndNameErrorCode}, nil
 	}
-
-	id := repository.EmployeeIdByName(name, surname)
 
 	h := repository.GetHoursWorked(id)
-	jsonResponse := fmt.Sprintf(`"hours":"%f"`, h)
-	_, err := w.Write([]byte(jsonResponse))
-	if err != nil {
-		Log.Printf("error while trying to send response, err:%s", err.Error())
+	if h == -1 {
+		code := &grpc.ResponseCode{Code: 400, Error: "user id not found in database"}
+		return &grpc.HoursWorked{Hours: h, ResponseCode: code}, nil
 	}
+	return &grpc.HoursWorked{Hours: h, ResponseCode: &successCode}, nil
 }
 
-func (EmployeeServer) SalaryPerHour(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
-	if err != nil {
-		w.WriteHeader(500)
-		_, err = w.Write([]byte(`"error":"cannot parse an employee id"`))
-		if err != nil {
-			Log.Printf("error while trying to send response, err:%s", err.Error())
-		}
-		return
+func (EmployeeServer) SalaryPerHour(ctx context.Context, e *grpc.Employee) (*grpc.SalaryPH, error) {
+	var id int64 = -1
+	if e.GetId() != 0 {
+		id = e.GetId()
+	} else if e.GetName() != "" && e.GetSurname() != "" {
+		name := e.GetName()
+		surname := e.GetSurname()
+		id = repository.EmployeeIdByName(name, surname)
+	} else {
+		return &grpc.SalaryPH{ResponseCode: &noIdAndNameErrorCode}, nil
 	}
-	h := repository.GetSalaryPerHour(id)
-	jsonResponse := fmt.Sprintf(`"slaryPerHour":"%f"`, h)
-	_, err = w.Write([]byte(jsonResponse))
-	if err != nil {
-		Log.Printf("error while trying to send response, err:%s", err.Error())
-	}
-}
 
-func (EmployeeServer) SalaryPerHourByName(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	surname := r.URL.Query().Get("surname")
-	if name == "" || surname == "" {
-		w.WriteHeader(500)
-		_, err := w.Write([]byte(`"error":"cannot parse an employee name/surname"`))
-		if err != nil {
-			Log.Printf("error while trying to send response, err:%s", err.Error())
-		}
-		return
-	}
-	id := repository.EmployeeIdByName(name, surname)
-
-	h := repository.GetSalaryPerHour(id)
-	jsonResponse := fmt.Sprintf(`"slaryPerHour":"%f"`, h)
-	_, err := w.Write([]byte(jsonResponse))
-	if err != nil {
-		Log.Printf("error while trying to send response, err:%s", err.Error())
-	}
+	s := repository.GetSalaryPerHour(id)
+	return &grpc.SalaryPH{Salary: s, ResponseCode: &successCode}, nil
 }

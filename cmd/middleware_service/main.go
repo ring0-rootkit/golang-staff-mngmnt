@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+// TODO implement GetWorkedHours and GetSalaryPerHour in gRPC client
+
 func main() {
 	// gRPC configuration and startup
 	var opts []grpc.DialOption

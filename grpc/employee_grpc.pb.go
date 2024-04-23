@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type EmployeeControllerClient interface {
 	StartWorkShift(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*ResponseCode, error)
 	EndWorkShift(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*ResponseCode, error)
+	GetWorkedHours(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*HoursWorked, error)
+	SalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error)
 }
 
 type employeeControllerClient struct {
@@ -52,12 +54,32 @@ func (c *employeeControllerClient) EndWorkShift(ctx context.Context, in *Employe
 	return out, nil
 }
 
+func (c *employeeControllerClient) GetWorkedHours(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*HoursWorked, error) {
+	out := new(HoursWorked)
+	err := c.cc.Invoke(ctx, "/EmployeeController/GetWorkedHours", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *employeeControllerClient) SalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error) {
+	out := new(SalaryPH)
+	err := c.cc.Invoke(ctx, "/EmployeeController/SalaryPerHour", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EmployeeControllerServer is the server API for EmployeeController service.
 // All implementations must embed UnimplementedEmployeeControllerServer
 // for forward compatibility
 type EmployeeControllerServer interface {
 	StartWorkShift(context.Context, *Employee) (*ResponseCode, error)
 	EndWorkShift(context.Context, *Employee) (*ResponseCode, error)
+	GetWorkedHours(context.Context, *Employee) (*HoursWorked, error)
+	SalaryPerHour(context.Context, *Employee) (*SalaryPH, error)
 	mustEmbedUnimplementedEmployeeControllerServer()
 }
 
@@ -70,6 +92,12 @@ func (UnimplementedEmployeeControllerServer) StartWorkShift(context.Context, *Em
 }
 func (UnimplementedEmployeeControllerServer) EndWorkShift(context.Context, *Employee) (*ResponseCode, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EndWorkShift not implemented")
+}
+func (UnimplementedEmployeeControllerServer) GetWorkedHours(context.Context, *Employee) (*HoursWorked, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkedHours not implemented")
+}
+func (UnimplementedEmployeeControllerServer) SalaryPerHour(context.Context, *Employee) (*SalaryPH, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SalaryPerHour not implemented")
 }
 func (UnimplementedEmployeeControllerServer) mustEmbedUnimplementedEmployeeControllerServer() {}
 
@@ -120,6 +148,42 @@ func _EmployeeController_EndWorkShift_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EmployeeController_GetWorkedHours_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Employee)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployeeControllerServer).GetWorkedHours(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/EmployeeController/GetWorkedHours",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployeeControllerServer).GetWorkedHours(ctx, req.(*Employee))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EmployeeController_SalaryPerHour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Employee)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EmployeeControllerServer).SalaryPerHour(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/EmployeeController/SalaryPerHour",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EmployeeControllerServer).SalaryPerHour(ctx, req.(*Employee))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // EmployeeController_ServiceDesc is the grpc.ServiceDesc for EmployeeController service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +198,14 @@ var EmployeeController_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EndWorkShift",
 			Handler:    _EmployeeController_EndWorkShift_Handler,
+		},
+		{
+			MethodName: "GetWorkedHours",
+			Handler:    _EmployeeController_GetWorkedHours_Handler,
+		},
+		{
+			MethodName: "SalaryPerHour",
+			Handler:    _EmployeeController_SalaryPerHour_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

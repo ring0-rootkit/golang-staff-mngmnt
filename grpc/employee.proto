@@ -1,17 +1,33 @@
+//protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative grpc/employee.proto
+
 syntax = "proto3";
 option go_package = "github.com/ring0-rootkit/golang-staff-mngmnt/grpc";
 
 service EmployeeController {
     rpc StartWorkShift(Employee) returns (ResponseCode) {}
     rpc EndWorkShift(Employee) returns (ResponseCode) {}
+    rpc GetWorkedHours(Employee) returns (HoursWorked) {}
+    rpc SalaryPerHour(Employee) returns (SalaryPH) {}
 }
 
 message Employee {
     int64 id = 1;
+    string name = 2;
+    string surname = 3;
 }
 
 message ResponseCode {
     int32 code = 1;
     // if code if 4xx or 5xx then we have 'error'
     string error = 2;
+}
+
+message HoursWorked {
+    double hours = 1;
+    ResponseCode responseCode = 2;
+}
+
+message SalaryPH{
+    double salary = 1;
+    ResponseCode responseCode = 2;
 }
