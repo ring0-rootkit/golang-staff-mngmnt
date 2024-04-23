@@ -1,18 +1,34 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/ring0-rootkit/golang-staff-mngmnt/grpc"
 	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/common/logging"
 	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/db_service/repository"
 )
 
 var Log *log.Logger = logging.GetFor("db_service repository")
 
-func GetWorkedHours(w http.ResponseWriter, r *http.Request) {
+type EmployeeServer struct {
+	grpc.UnimplementedEmployeeControllerServer
+}
+
+func (EmployeeServer) StartWorkShift(ctx context.Context, e *grpc.Employee) (*grpc.ResponseCode, error) {
+	Log.Printf("Got employee for start workshift id:%d", e.GetId())
+	return &grpc.ResponseCode{Code: 200, Error: ""}, nil
+}
+
+func (EmployeeServer) EndWorkShift(ctx context.Context, e *grpc.Employee) (*grpc.ResponseCode, error) {
+	Log.Printf("Got employee for end workshift id:%d", e.GetId())
+	return &grpc.ResponseCode{Code: 200, Error: ""}, nil
+}
+
+func (EmployeeServer) GetWorkedHours(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(500)
@@ -30,7 +46,7 @@ func GetWorkedHours(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func GetWorkedHoursByName(w http.ResponseWriter, r *http.Request) {
+func (EmployeeServer) GetWorkedHoursByName(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	surname := r.URL.Query().Get("surname")
 	if name == "" || surname == "" {
@@ -52,7 +68,7 @@ func GetWorkedHoursByName(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SalaryPerHour(w http.ResponseWriter, r *http.Request) {
+func (EmployeeServer) SalaryPerHour(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
 	if err != nil {
 		w.WriteHeader(500)
@@ -70,7 +86,7 @@ func SalaryPerHour(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SalaryPerHourByName(w http.ResponseWriter, r *http.Request) {
+func (EmployeeServer) SalaryPerHourByName(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	surname := r.URL.Query().Get("surname")
 	if name == "" || surname == "" {

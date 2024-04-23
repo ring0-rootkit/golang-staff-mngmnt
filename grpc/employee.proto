@@ -1,0 +1,17 @@
+syntax = "proto3";
+option go_package = "github.com/ring0-rootkit/golang-staff-mngmnt/grpc";
+
+service EmployeeController {
+    rpc StartWorkShift(Employee) returns (ResponseCode) {}
+    rpc EndWorkShift(Employee) returns (ResponseCode) {}
+}
+
+message Employee {
+    int64 id = 1;
+}
+
+message ResponseCode {
+    int32 code = 1;
+    // if code if 4xx or 5xx then we have 'error'
+    string error = 2;
+}
