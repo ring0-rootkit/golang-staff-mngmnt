@@ -1,0 +1,4 @@
+//protoc --go_out=./stat --go_opt=paths=source_relative --go-grpc_out=./stat --go-grpc_opt=paths=source_relative stat.proto
+
+syntax = "proto3";
+option go_package = "github.com/ring0-rootkit/golang-staff-mngmnt/grpc/stat";

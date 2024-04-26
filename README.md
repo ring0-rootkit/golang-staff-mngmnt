@@ -18,10 +18,4 @@ that service stores data in sql database and able to send data to logging servic
 and db service using grpc
 
 ### technologies
-go, gorm, postgres, grpc, kafka
-
-## logging service
-that service takes data from db service and using ?graphana? shows statistics
-
-### technologies
-go, grpc, kafka, ?graphana?
+go, gorm, postgres, grpc
