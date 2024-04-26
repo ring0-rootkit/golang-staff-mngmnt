@@ -25,7 +25,7 @@ type EmployeeControllerClient interface {
 	StartWorkShift(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*ResponseCode, error)
 	EndWorkShift(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*ResponseCode, error)
 	GetWorkedHours(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*HoursWorked, error)
-	SalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error)
+	GetSalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error)
 }
 
 type employeeControllerClient struct {
@@ -63,9 +63,9 @@ func (c *employeeControllerClient) GetWorkedHours(ctx context.Context, in *Emplo
 	return out, nil
 }
 
-func (c *employeeControllerClient) SalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error) {
+func (c *employeeControllerClient) GetSalaryPerHour(ctx context.Context, in *Employee, opts ...grpc.CallOption) (*SalaryPH, error) {
 	out := new(SalaryPH)
-	err := c.cc.Invoke(ctx, "/EmployeeController/SalaryPerHour", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/EmployeeController/GetSalaryPerHour", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ type EmployeeControllerServer interface {
 	StartWorkShift(context.Context, *Employee) (*ResponseCode, error)
 	EndWorkShift(context.Context, *Employee) (*ResponseCode, error)
 	GetWorkedHours(context.Context, *Employee) (*HoursWorked, error)
-	SalaryPerHour(context.Context, *Employee) (*SalaryPH, error)
+	GetSalaryPerHour(context.Context, *Employee) (*SalaryPH, error)
 	mustEmbedUnimplementedEmployeeControllerServer()
 }
 
@@ -96,8 +96,8 @@ func (UnimplementedEmployeeControllerServer) EndWorkShift(context.Context, *Empl
 func (UnimplementedEmployeeControllerServer) GetWorkedHours(context.Context, *Employee) (*HoursWorked, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkedHours not implemented")
 }
-func (UnimplementedEmployeeControllerServer) SalaryPerHour(context.Context, *Employee) (*SalaryPH, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SalaryPerHour not implemented")
+func (UnimplementedEmployeeControllerServer) GetSalaryPerHour(context.Context, *Employee) (*SalaryPH, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSalaryPerHour not implemented")
 }
 func (UnimplementedEmployeeControllerServer) mustEmbedUnimplementedEmployeeControllerServer() {}
 
@@ -166,20 +166,20 @@ func _EmployeeController_GetWorkedHours_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EmployeeController_SalaryPerHour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EmployeeController_GetSalaryPerHour_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Employee)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EmployeeControllerServer).SalaryPerHour(ctx, in)
+		return srv.(EmployeeControllerServer).GetSalaryPerHour(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/EmployeeController/SalaryPerHour",
+		FullMethod: "/EmployeeController/GetSalaryPerHour",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EmployeeControllerServer).SalaryPerHour(ctx, req.(*Employee))
+		return srv.(EmployeeControllerServer).GetSalaryPerHour(ctx, req.(*Employee))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -204,8 +204,8 @@ var EmployeeController_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EmployeeController_GetWorkedHours_Handler,
 		},
 		{
-			MethodName: "SalaryPerHour",
-			Handler:    _EmployeeController_SalaryPerHour_Handler,
+			MethodName: "GetSalaryPerHour",
+			Handler:    _EmployeeController_GetSalaryPerHour_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -51,8 +51,8 @@ func (EmployeeServer) GetWorkedHours(ctx context.Context, e *grpc.Employee) (*gr
 	return &grpc.HoursWorked{Hours: h, ResponseCode: &successCode}, nil
 }
 
-func (EmployeeServer) SalaryPerHour(ctx context.Context, e *grpc.Employee) (*grpc.SalaryPH, error) {
-	var id int64 = -1
+func (EmployeeServer) GetSalaryPerHour(ctx context.Context, e *grpc.Employee) (*grpc.SalaryPH, error) {
+	var id int64
 	if e.GetId() != 0 {
 		id = e.GetId()
 	} else if e.GetName() != "" && e.GetSurname() != "" {
@@ -64,5 +64,6 @@ func (EmployeeServer) SalaryPerHour(ctx context.Context, e *grpc.Employee) (*grp
 	}
 
 	s := repository.GetSalaryPerHour(id)
-	return &grpc.SalaryPH{Salary: s, ResponseCode: &successCode}, nil
+	return &grpc.SalaryPH{Salary: &grpc.Salary{Dollars: s.SpHDollars, Cents: s.SpHCents},
+		ResponseCode: &successCode}, nil
 }

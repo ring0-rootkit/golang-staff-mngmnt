@@ -24,14 +24,4 @@ func main() {
 	pb.RegisterEmployeeControllerServer(grpcServer, handlers.EmployeeServer{})
 
 	_ = grpcServer.Serve(lis)
-
-	// mux := http.NewServeMux()
-	//
-	// //TODO move this to grpc
-	// mux.HandleFunc("/employee/{id}/hours", handlers.GetWorkedHours)
-	// mux.HandleFunc("/employee/hours", handlers.GetWorkedHoursByName)
-	// mux.HandleFunc("/employee/{id}/salary", handlers.SalaryPerHour)
-	// mux.HandleFunc("/employee/salary", handlers.SalaryPerHourByName)
-	//
-	// _ = http.ListenAndServe(":9000", mux)
 }

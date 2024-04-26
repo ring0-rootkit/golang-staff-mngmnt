@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	pb "github.com/ring0-rootkit/golang-staff-mngmnt/grpc"
-	"github.com/ring0-rootkit/golang-staff-mngmnt/pkg/middlware_service/handlers"
+	rpc_handler "github.com/ring0-rootkit/golang-staff-mngmnt/pkg/middlware_service/handlers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -27,8 +27,13 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/employee/{id}/start", handlers.StartShiftWithClient(client))
-	mux.HandleFunc("/employee/{id}/end", handlers.EndShiftWithClient(client))
+	mux.HandleFunc("/employee/{id}/start", rpc_handler.StartShift(client))
+	mux.HandleFunc("/employee/{id}/end", rpc_handler.EndShift(client))
+
+	mux.HandleFunc("/employee/{id}/hours", rpc_handler.GetWorkedHours(client))
+	mux.HandleFunc("/employee/hours", rpc_handler.GetWorkedHoursByName(client))
+	mux.HandleFunc("/employee/{id}/salary", rpc_handler.SalaryPerHour(client))
+	mux.HandleFunc("/employee/salary", rpc_handler.SalaryPerHourByName(client))
 
 	_ = http.ListenAndServe(":8080", mux)
 }

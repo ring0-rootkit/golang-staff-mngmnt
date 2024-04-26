@@ -7,7 +7,7 @@ service EmployeeController {
     rpc StartWorkShift(Employee) returns (ResponseCode) {}
     rpc EndWorkShift(Employee) returns (ResponseCode) {}
     rpc GetWorkedHours(Employee) returns (HoursWorked) {}
-    rpc SalaryPerHour(Employee) returns (SalaryPH) {}
+    rpc GetSalaryPerHour(Employee) returns (SalaryPH) {}
 }
 
 message Employee {
@@ -28,6 +28,11 @@ message HoursWorked {
 }
 
 message SalaryPH{
-    double salary = 1;
+    Salary salary = 1;
     ResponseCode responseCode = 2;
+}
+
+message Salary {
+    int64 dollars = 1;
+    int64 cents = 2;
 }

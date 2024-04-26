@@ -33,7 +33,8 @@ type Attendance struct {
 }
 
 type Salary struct {
-	SpH float64 `gorm:"column:salary_per_hour"`
+	SpHDollars int64 `gorm:"column:salary_per_hour_dollars"`
+	SpHCents   int64 `gorm:"column:salary_per_hour_cents"`
 }
 
 var db *gorm.DB
@@ -69,11 +70,12 @@ func GetHoursWorked(id int64) float64 {
 	return hoursWorked
 }
 
-func GetSalaryPerHour(id int64) float64 {
+func GetSalaryPerHour(id int64) Salary {
 	var s Salary
-	db.Table("salary").Select("salary_per_hour").Where("employee_id = ?", id).First(&s)
+	db.Table("salary").Select("salary_per_hour_dollars", "salary_per_hour_cents").
+		Where("employee_id = ?", id).First(&s)
 
-	return s.SpH
+	return s
 }
 
 func EmitWorkEvent(id int64, event WorkEvent) {
